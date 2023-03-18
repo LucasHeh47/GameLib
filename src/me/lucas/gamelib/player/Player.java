@@ -1,6 +1,6 @@
 package me.lucas.gamelib.player;
 
-import java.util.ArrayList;
+import java.awt.Graphics;
 
 import me.lucas.gamelib.Game;
 import me.lucas.gamelib.InputHandler;
@@ -57,7 +57,8 @@ public class Player extends GameObject{
 		setLocation(camera.getCenter());
 	}
 	
-	public void update() {
+	@Override
+	public void update(Graphics g) {
 //    	System.out.println(energy);
 		mouseX = (int) (inputHandler.mouseX + game.getCamera().getLocation().getX());
 		mouseY = (int) (inputHandler.mouseY + game.getCamera().getLocation().getY());
@@ -97,6 +98,7 @@ public class Player extends GameObject{
 		}
 		chargeHealth();
 		chargeEnergy();
+		render(g);
 	}
 	
 	public void wasdMovement(InputHandler inputHandler) {

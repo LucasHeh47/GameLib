@@ -17,6 +17,8 @@ import me.lucas.gamelib.game.Camera;
 import me.lucas.gamelib.game.Map;
 import me.lucas.gamelib.game.Maps;
 import me.lucas.gamelib.game.entities.Enemy;
+import me.lucas.gamelib.game.entities.enemies.BasicEnemy;
+import me.lucas.gamelib.game.ui.MiniMap;
 import me.lucas.gamelib.player.Player;
 import me.lucas.gamelib.player.PlayerControlType;
 import me.lucas.gamelib.utils.GameObject;
@@ -44,6 +46,7 @@ public class Game extends JPanel implements ActionListener, Runnable {
 	}
 	private Player player;
 	private Camera camera;
+	private MiniMap miniMap;
     
 	private BufferedImage buffer;
 	
@@ -67,31 +70,38 @@ public class Game extends JPanel implements ActionListener, Runnable {
         WIDTH = 1280;
         buffer = new BufferedImage(WIDTH, HEIGHT, BufferedImage.TYPE_INT_RGB);
 
-        Vector2D playerSpawn = new Vector2D(1200, 2500);
+        Vector2D playerSpawn = new Vector2D(1, 1);
         
         camera = new Camera(this, playerSpawn.subtract(new Vector2D(WIDTH/2, HEIGHT/2)), WIDTH, HEIGHT);
+        mapHandler = new Maps();
+        map = new Map(mapHandler.createRandomMap(seed, 500, 500)
+        		, 
+        		64, // Tile size - Original 64
+        		this);
         
         player = new Player(this, playerSpawn);
         player.setColor(Color.BLUE)
+        	.setGameLocationByTile(new Vector2D(10, 2))
         	.setSize(new Vector2D(30, 30))
-        	.setSpeed(new Vector2D(4, 4))
+        	.setSpeed(new Vector2D(6, 6))
         	.setMaxSpeed(new Vector2D(7.5, 7.5));
         
 
-        Enemy enemy = new Enemy(this, 100);
+        Enemy enemy = new BasicEnemy(this, 100, 512);
         enemy.setColor(Color.RED)
-        	.setGameLocation(new Vector2D(500, 700))
+        	.setGameLocationByTile(new Vector2D(2, 2))
         	.setSize(new Vector2D(20, 20))
-        	.setSpeed(new Vector2D(8, 8))
+        	.setSpeed(new Vector2D(1, 1))
         	.setMaxSpeed(new Vector2D(7.5, 7.5));
         
-        mapHandler = new Maps();
-        map = new Map(mapHandler.createRandomMap(seed, 100, 100), 64, this);
         
         gameWidth = map.getMap().length*map.getTileSize();
         gameHeight = map.getMap()[0].length*map.getTileSize();
         
-        setBackground(Color.WHITE);
+        
+        miniMap = new MiniMap(this, 
+        		new Vector2D(WIDTH-(WIDTH*0.2)-25, 10),
+        		new Vector2D(WIDTH*0.2, WIDTH*0.2));
         
         timer = new Timer(16, this);
         timer.start();
@@ -102,6 +112,8 @@ public class Game extends JPanel implements ActionListener, Runnable {
 	        thread = new Thread(this);
 	        running = true;
 	        thread.start();
+	    } else {
+	    	System.exit(0);
 	    }
     }
     
@@ -144,10 +156,8 @@ public class Game extends JPanel implements ActionListener, Runnable {
     }
     
     public void update() {
-    	player.update();
         if(player.controlType == PlayerControlType.WASD) player.wasdMovement(inputHandler);
         if(inputHandler.isLeftMouseDown()) player.attack();
-        camera.update();
 
         // Create graphics object from buffer
         Graphics2D g2d = (Graphics2D) buffer.getGraphics();
@@ -162,10 +172,12 @@ public class Game extends JPanel implements ActionListener, Runnable {
         	// For sprites
 //          Vector2D renderPosition = obj.getRenderPosition();
 //          g.drawImage(obj.getImage(), (int) renderPosition.getX(), (int) renderPosition.getY(), null);
-            obj.render(g2d);
+            obj.update(g2d);
         }
 
         // Dispose of the graphics object
+        camera.update();
+        miniMap.update(g2d);
         g2d.dispose();
     }
     
@@ -192,5 +204,20 @@ public class Game extends JPanel implements ActionListener, Runnable {
 	}
 	public void setCamera(Camera camera) {
 		this.camera = camera;
+	}
+	public MiniMap getMiniMap() {
+		return miniMap;
+	}
+	public void setMiniMap(MiniMap miniMap) {
+		this.miniMap = miniMap;
+	}
+	public Timer getTimer() {
+		return timer;
+	}
+	public boolean isRunning() {
+		return running;
+	}
+	public Maps getMapHandler() {
+		return mapHandler;
 	}
 }

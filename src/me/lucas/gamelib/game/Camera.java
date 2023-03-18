@@ -41,10 +41,6 @@ public class Camera {
 	public Vector2D getCenter() {
 		return new Vector2D(width/2, height/2);
 	}
-	
-	public void setLocationWithCenter(Vector2D center) {
-		this.location = new Vector2D(center.getX()-(width/2), center.getY()-(height/2));
-	}
 
 	public Vector2D getLocation() {
 		return location;

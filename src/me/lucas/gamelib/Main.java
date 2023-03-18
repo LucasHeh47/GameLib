@@ -12,8 +12,8 @@ public class Main {
         Game game = new Game(frame);
         frame.setSize(game.WIDTH, game.HEIGHT);
         frame.add(game);
-        
+
         frame.setVisible(true);
-        if(!frame.isVisible()) System.exit(0);
+        if(!frame.isVisible() || game == null) System.exit(0);
     }
 }

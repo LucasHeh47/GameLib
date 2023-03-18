@@ -16,6 +16,8 @@ public class GameObject {
 	protected Vector2D speed;
 	protected Vector2D maxSpeed;
 	
+	protected Force force;
+	
 	protected Game game;
 	
 	public GameObject(Game game) {
@@ -28,6 +30,11 @@ public class GameObject {
 	    g.setColor(color);
 	    Vector2D screenPos = getGameLocation().subtract(game.getCamera().getLocation());
 	    g.fillRect(screenPos.getXint(), screenPos.getYint(), size.getXint(), size.getYint());
+	}
+	
+	public void update(Graphics g) {
+		if(hasForce()) setGameLocation(getGameLocation().add(force.getForce()));
+		render(g);
 	}
 
 	
@@ -43,6 +50,10 @@ public class GameObject {
 	
 	public void destroy() {
 		Game.activeGameObjects.remove(this);
+	}
+	
+	public boolean hasForce() {
+		return force != null;
 	}
 	
 	public Vector2D getRenderPosition() {
@@ -62,6 +73,11 @@ public class GameObject {
 	}
 	public GameObject setGameLocation(Vector2D location) {
 		this.gameLocation = location;
+		return this;
+	}
+	public GameObject setGameLocationByTile(Vector2D location) {
+		this.gameLocation = new Vector2D(location.getX()*game.getMap().getTileSize(),
+				location.getY()*game.getMap().getTileSize());
 		return this;
 	}
 	public Vector2D getSize() {
